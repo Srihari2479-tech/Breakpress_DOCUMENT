@@ -1812,25 +1812,46 @@ if __name__ == "__main__":
             });
         }
 
-        // Global Live Filter / Search Functionality
+        // Upgraded Global Live Search Engine with Auto-Expanding Accordions
         function filterContent() {
-            const input = document.getElementById('globalSearch').value.toLowerCase();
-            if (!input) {
-                document.querySelectorAll('.section-pane, .qna-card, tr').forEach(card => card.style.display = '');
+            const query = document.getElementById('globalSearch').value.trim().toLowerCase();
+            const sections = document.querySelectorAll('.section-pane');
+
+            if (!query) {
+                // Restore all sections and cards to default view
+                sections.forEach(section => section.style.display = '');
+                document.querySelectorAll('.qna-card, tbody tr, .timeline-step').forEach(elem => elem.style.display = '');
                 return;
             }
 
-            const elements = document.querySelectorAll('.timeline-step, .qna-card, tr');
-            elements.forEach(elem => {
-                const text = elem.innerText.toLowerCase();
-                if (text.includes(input)) {
-                    elem.style.display = '';
+            sections.forEach(section => {
+                const sectionText = section.innerText.toLowerCase();
+                const hasMatch = sectionText.includes(query);
+
+                if (hasMatch) {
+                    section.style.display = '';
+
+                    // Auto-expand any accordion containing the query term
+                    section.querySelectorAll('.accordion-item').forEach(accordion => {
+                        const accText = accordion.innerText.toLowerCase();
+                        if (accText.includes(query)) {
+                            accordion.classList.add('open');
+                        }
+                    });
+
+                    // Filter Q&A cards
+                    section.querySelectorAll('.qna-card').forEach(card => {
+                        const match = card.innerText.toLowerCase().includes(query);
+                        card.style.display = match ? '' : 'none';
+                    });
+
+                    // Filter Table rows
+                    section.querySelectorAll('tbody tr').forEach(row => {
+                        const match = row.innerText.toLowerCase().includes(query);
+                        row.style.display = match ? '' : 'none';
+                    });
                 } else {
-                    if (elem.tagName === 'TR' && elem.parentElement.tagName === 'THEAD') {
-                        elem.style.display = '';
-                    } else {
-                        elem.style.display = 'none';
-                    }
+                    section.style.display = 'none';
                 }
             });
         }
