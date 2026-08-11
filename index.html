@@ -741,6 +741,130 @@
         .accordion-item.open .accordion-header i {
             transform: rotate(180deg);
         }
+
+        /* ==========================================================================
+           RESPONSIVE BREAKPOINTS (Mobile, Tablet & Mobile Devices Optimization)
+           ========================================================================== */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+
+        /* Tablets & Medium Screens (max-width: 1024px) */
+        @media (max-width: 1024px) {
+            .app-header {
+                padding: 0.85rem 1.5rem;
+            }
+
+            .main-container {
+                padding: 6.5rem 1.5rem 3rem 1.5rem;
+            }
+
+            .visual-flow-row.row-top .visual-step-box,
+            .visual-flow-row.row-bottom .visual-step-box {
+                flex: 1 1 calc(50% - 1rem);
+                min-width: 220px;
+            }
+
+            .timeline-container {
+                grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            }
+        }
+
+        /* Mobile Phones & Small Devices (max-width: 640px) */
+        @media (max-width: 640px) {
+            .app-header {
+                padding: 0.75rem 1rem;
+            }
+
+            .brand-text h1 {
+                font-size: 1.05rem;
+            }
+
+            .brand-text p {
+                font-size: 0.7rem;
+                display: none;
+            }
+
+            .main-container {
+                padding: 5.5rem 0.75rem 2rem 0.75rem;
+            }
+
+            .section-pane {
+                padding: 1.25rem 0.85rem;
+                border-radius: 16px;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
+                flex-wrap: wrap;
+            }
+
+            .visual-flow-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .visual-flow-row.row-top .visual-step-box,
+            .visual-flow-row.row-bottom .visual-step-box {
+                flex: 1 1 100%;
+                width: 100%;
+                min-width: 100%;
+            }
+
+            .flow-nodes {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .flow-connector {
+                width: 2px;
+                height: 24px;
+                margin: 0.25rem 0;
+            }
+
+            .flow-node {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .qna-card {
+                padding: 1.2rem 0.85rem;
+            }
+
+            .accordion-header {
+                padding: 1rem 0.85rem;
+                font-size: 0.88rem;
+            }
+
+            .accordion-content {
+                padding: 1rem 0.75rem;
+            }
+
+            .nav-drawer {
+                width: calc(100vw - 2rem);
+                right: 1rem;
+                top: 4rem;
+            }
+
+            pre code {
+                font-size: 0.78rem;
+                white-space: pre-wrap;
+                word-break: break-all;
+            }
+
+            .copy-btn {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 0.75rem;
+                width: 100%;
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1382,61 +1506,63 @@
             </div>
             <p>Below is the exhaustive action-consequence table detailing every user interaction, what executes on the Python backend, state changes, generated output files, UI feedback, and what unlocks next.</p>
 
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Workflow Stage</th>
-                        <th>User Action & Instructions</th>
-                        <th>Backend Execution & OpenCV Logic</th>
-                        <th>Output Files & State Changes</th>
-                        <th>UI Feedback & Next Trigger</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Step 1.1: Grid Boundary Selection</strong></td>
-                        <td>Double-click Top-Left and Bottom-Right intersections of the chessboard grid on the canvas. Right-click to undo.</td>
-                        <td>Calls `POST /api/find-corner` $\rightarrow$ Dynamic crop `gray[t:b, l:r]` $\rightarrow$ Shi-Tomasi corner detection $\rightarrow$ `cv.cornerSubPix` refinement $\rightarrow$ `find-corners` grid interpolation.</td>
-                        <td>Updates in-memory grid state.<br>No output files generated yet.</td>
-                        <td>Neon orange crosshairs snap to corner intersections.<br>Green grid lines overlay detected board.<br><strong>Unlocks:</strong> Manual Point Nudging.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Step 1.2: Sub-Pixel WASD Refinement</strong></td>
-                        <td>Click any green grid circle to select it (turns orange). Press <strong>W/A/S/D</strong> or Arrow Keys to nudge coordinate by 0.1px.</td>
-                        <td>Client intercepts keydown events $\rightarrow$ Modifies point coordinates in float precision $\rightarrow$ Sends updated point array to `POST /api/save-points`.</td>
-                        <td>Generates/Updates:<br><code>calibration_points.json</code><br>Syncs to Supabase DB.</td>
-                        <td>Selected target ring shifts visually on canvas in sub-pixel increments.<br><strong>Unlocks:</strong> "Save & Next Image" and "Run Camera Calibration".</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Step 1.3: Run Camera Calibration</strong></td>
-                        <td>Click <strong>"Run Camera Calibration"</strong> button in sidebar after annotating active chessboard images.</td>
-                        <td>Calls `POST /api/calibrate` $\rightarrow$ Builds 3D object grid `objp` $\rightarrow$ Runs `cv.calibrateCamera(objpoints, imgpoints, image_size, flags=CALIB_FIX_ASPECT_RATIO)` $\rightarrow$ Calculates RMS reprojection error.</td>
-                        <td>Generates Output Files:<br><code>mtx.npy</code> (3x3 Matrix)<br><code>dist.npy</code> (Distortion Vector)<br><code>calib_meta.json</code> (Resolution)</td>
-                        <td>Calibration results panel displays Reprojection Error ($< 0.50\text{ px}$) and camera matrix coefficients.<br><strong>Unlocks:</strong> Step 2 (Homography).</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Step 2.1: Homography Corner Selection</strong></td>
-                        <td>Switch to Step 2 tab. Click the 4 outermost grid corners in strict <strong>Clockwise Order</strong>: TL $\rightarrow$ TR $\rightarrow$ BR $\rightarrow$ BL.</td>
-                        <td>Calls `POST /api/find-undistorted-corner` $\rightarrow$ Undistorts source frame using `mtx.npy` & `dist.npy` $\rightarrow$ Snaps click on straightened image plane $\rightarrow$ Calls `POST /api/save-clicked-points`.</td>
-                        <td>Generates Output File:<br><code>clicked_points.txt</code><br>(Contains 4 clicked coordinates + grid dimension row).</td>
-                        <td>Numbered target rings (1, 2, 3, 4) appear on canvas.<br>Connecting blue quadrangle outlines selected region.<br><strong>Unlocks:</strong> Perspective Warped Preview.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Step 2.2: Perspective Warped Preview Output</strong></td>
-                        <td>Automatically triggers upon receiving 4th valid corner click or clicking <strong>"Save & Warp Perspective"</strong>.</td>
-                        <td>Calls `h_adjust(undistorted, pts, size)` $\rightarrow$ Calculates square size `dist / x` $\rightarrow$ Computes homography matrix $H$ via `cv2.findHomography` $\rightarrow$ Executes `cv2.warpPerspective`.</td>
-                        <td>Generates Output File:<br><code>corrected_preview.png</code><br>(Flattened orthorectified image).</td>
-                        <td>Warped preview panel updates live in sidebar displaying top-down flattened grid with parallel edges.<br><strong>Unlocks:</strong> Step 3 (Scale Calibration).</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Step 3.1 & 3.2: Physical Scale Calibration</strong></td>
-                        <td>Enter known physical dimensions (e.g. 1.0 inch per square) and click <strong>"Compute Scale Factor"</strong>.</td>
-                        <td>Calls `POST /api/save-scale-calibration` $\rightarrow$ Calculates horizontal ($\text{inch}/\Delta x$) and vertical ($\text{inch}/\Delta y$) scale factors $\rightarrow$ Computes mean scale vectors.</td>
-                        <td>Generates Output Files:<br><code>inches_per_pixel_h.npy</code><br><code>inches_per_pixel_v.npy</code><br><code>scale_calibration.json</code></td>
-                        <td>Displays final scale metrics (e.g., $0.00245\text{ in/px}$).<br>System readiness status updates to <strong>"100% Calibrated & Ready"</strong>.</td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Workflow Stage</th>
+                            <th>User Action & Instructions</th>
+                            <th>Backend Execution & OpenCV Logic</th>
+                            <th>Output Files & State Changes</th>
+                            <th>UI Feedback & Next Trigger</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Step 1.1: Grid Boundary Selection</strong></td>
+                            <td>Double-click Top-Left and Bottom-Right intersections of the chessboard grid on the canvas. Right-click to undo.</td>
+                            <td>Calls `POST /api/find-corner` $\rightarrow$ Dynamic crop `gray[t:b, l:r]` $\rightarrow$ Shi-Tomasi corner detection $\rightarrow$ `cv.cornerSubPix` refinement $\rightarrow$ `find-corners` grid interpolation.</td>
+                            <td>Updates in-memory grid state.<br>No output files generated yet.</td>
+                            <td>Neon orange crosshairs snap to corner intersections.<br>Green grid lines overlay detected board.<br><strong>Unlocks:</strong> Manual Point Nudging.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Step 1.2: Sub-Pixel WASD Refinement</strong></td>
+                            <td>Click any green grid circle to select it (turns orange). Press <strong>W/A/S/D</strong> or Arrow Keys to nudge coordinate by 0.1px.</td>
+                            <td>Client intercepts keydown events $\rightarrow$ Modifies point coordinates in float precision $\rightarrow$ Sends updated point array to `POST /api/save-points`.</td>
+                            <td>Generates/Updates:<br><code>calibration_points.json</code><br>Syncs to Supabase DB.</td>
+                            <td>Selected target ring shifts visually on canvas in sub-pixel increments.<br><strong>Unlocks:</strong> "Save & Next Image" and "Run Camera Calibration".</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Step 1.3: Run Camera Calibration</strong></td>
+                            <td>Click <strong>"Run Camera Calibration"</strong> button in sidebar after annotating active chessboard images.</td>
+                            <td>Calls `POST /api/calibrate` $\rightarrow$ Builds 3D object grid `objp` $\rightarrow$ Runs `cv.calibrateCamera(objpoints, imgpoints, image_size, flags=CALIB_FIX_ASPECT_RATIO)` $\rightarrow$ Calculates RMS reprojection error.</td>
+                            <td>Generates Output Files:<br><code>mtx.npy</code> (3x3 Matrix)<br><code>dist.npy</code> (Distortion Vector)<br><code>calib_meta.json</code> (Resolution)</td>
+                            <td>Calibration results panel displays Reprojection Error ($< 0.50\text{ px}$) and camera matrix coefficients.<br><strong>Unlocks:</strong> Step 2 (Homography).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Step 2.1: Homography Corner Selection</strong></td>
+                            <td>Switch to Step 2 tab. Click the 4 outermost grid corners in strict <strong>Clockwise Order</strong>: TL $\rightarrow$ TR $\rightarrow$ BR $\rightarrow$ BL.</td>
+                            <td>Calls `POST /api/find-undistorted-corner` $\rightarrow$ Undistorts source frame using `mtx.npy` & `dist.npy` $\rightarrow$ Snaps click on straightened image plane $\rightarrow$ Calls `POST /api/save-clicked-points`.</td>
+                            <td>Generates Output File:<br><code>clicked_points.txt</code><br>(Contains 4 clicked coordinates + grid dimension row).</td>
+                            <td>Numbered target rings (1, 2, 3, 4) appear on canvas.<br>Connecting blue quadrangle outlines selected region.<br><strong>Unlocks:</strong> Perspective Warped Preview.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Step 2.2: Perspective Warped Preview Output</strong></td>
+                            <td>Automatically triggers upon receiving 4th valid corner click or clicking <strong>"Save & Warp Perspective"</strong>.</td>
+                            <td>Calls `h_adjust(undistorted, pts, size)` $\rightarrow$ Calculates square size `dist / x` $\rightarrow$ Computes homography matrix $H$ via `cv2.findHomography` $\rightarrow$ Executes `cv2.warpPerspective`.</td>
+                            <td>Generates Output File:<br><code>corrected_preview.png</code><br>(Flattened orthorectified image).</td>
+                            <td>Warped preview panel updates live in sidebar displaying top-down flattened grid with parallel edges.<br><strong>Unlocks:</strong> Step 3 (Scale Calibration).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Step 3.1 & 3.2: Physical Scale Calibration</strong></td>
+                            <td>Enter known physical dimensions (e.g. 1.0 inch per square) and click <strong>"Compute Scale Factor"</strong>.</td>
+                            <td>Calls `POST /api/save-scale-calibration` $\rightarrow$ Calculates horizontal ($\text{inch}/\Delta x$) and vertical ($\text{inch}/\Delta y$) scale factors $\rightarrow$ Computes mean scale vectors.</td>
+                            <td>Generates Output Files:<br><code>inches_per_pixel_h.npy</code><br><code>inches_per_pixel_v.npy</code><br><code>scale_calibration.json</code></td>
+                            <td>Displays final scale metrics (e.g., $0.00245\text{ in/px}$).<br>System readiness status updates to <strong>"100% Calibrated & Ready"</strong>.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </section>
 
         <!-- ==========================================================================
@@ -1471,34 +1597,6 @@
 
             <!-- Benchmarks Matrix Table -->
             <h3 style="margin-top:2rem; margin-bottom:1rem;"><i class="fa-solid fa-table"></i> Accuracy Benchmark Matrix Across Formats & Scenarios</h3>
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Test Environment / Format</th>
-                        <th>Resolution (px)</th>
-                        <th>Tilt Angle</th>
-                        <th>Corner Detection Success (%)</th>
-                        <th>Reprojection Error (RMS)</th>
-                        <th>Physical Measurement Error</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>1080p Standard Studio Light</strong></td>
-                        <td>$1920 \times 1080$</td>
-                        <td>$0^\circ - 15^\circ$</td>
-                        <td><span class="badge badge-emerald">99.8%</span></td>
-                        <td>$0.34\text{ px}$</td>
-                        <td>$\pm 0.005\text{ in}$ ($\pm 0.12\text{ mm}$)</td>
-                    </tr>
-                    <tr>
-                        <td><strong>4K High-Res Press Bed</strong></td>
-                        <td>$3840 \times 2160$</td>
-                        <td>$15^\circ - 30^\circ$</td>
-                        <td><span class="badge badge-emerald">99.6%</span></td>
-                        <td>$0.38\text{ px}$</td>
-                        <td>$\pm 0.006\text{ in}$ ($\pm 0.15\text{ mm}$)</td>
-                    </tr>
                     <tr>
                         <td><strong>720p Industrial WebCam</strong></td>
                         <td>$1280 \times 720$</td>
