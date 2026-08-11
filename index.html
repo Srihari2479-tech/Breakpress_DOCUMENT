@@ -358,49 +358,67 @@
             background: var(--bg-inset);
             border: 1px solid var(--border-glass-bright);
             border-radius: 18px;
-            padding: 2rem;
+            padding: 1.75rem 1.5rem;
             margin: 2rem 0;
+            overflow-x: auto;
         }
 
         .flow-nodes {
             display: flex;
-            align-items: center;
+            align-items: stretch;
             justify-content: space-between;
-            gap: 1rem;
+            gap: 0.75rem;
             position: relative;
             z-index: 2;
-            flex-wrap: wrap;
         }
 
         .flow-node {
             background: var(--bg-glass-card);
             backdrop-filter: blur(8px);
             border: 1px solid var(--border-glass-bright);
-            border-radius: 14px;
-            padding: 1.2rem 1.5rem;
+            border-radius: 16px;
+            padding: 1.25rem 1rem;
             text-align: center;
-            flex: 1;
-            min-width: 180px;
+            flex: 1 1 0;
+            min-width: 170px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
             position: relative;
             transition: all 0.3s ease;
         }
 
         .flow-node.active-node {
             border-color: var(--primary);
-            box-shadow: 0 0 20px var(--primary-glow);
+            box-shadow: 0 0 24px var(--primary-glow);
+            background: rgba(255, 255, 255, 0.65);
+        }
+
+        .flow-node:hover {
+            border-color: var(--primary);
+            transform: translateY(-3px);
         }
 
         .flow-node-icon {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             color: var(--primary);
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.6rem;
+            width: 44px;
+            height: 44px;
+            background: rgba(33, 176, 227, 0.12);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .flow-connector {
-            flex: 0 0 40px;
-            height: 3px;
+            flex: 0 0 30px;
+            height: 2px;
             background: var(--border-glass-bright);
             position: relative;
+            align-self: center;
         }
 
         .flow-connector::after {
